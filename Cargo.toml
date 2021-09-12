@@ -1,0 +1,23 @@
+[package]
+name = "migration_initiator"
+version = "0.1.0"
+edition = "2018"
+default-run = "migration_initiator"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = "3.0.0-beta.4"
+itertools = "0.10.1"
+clickhouse = "0.7"
+tokio = {version = "1.4.0", features = ["full"] }
+walkdir = "2"
+chrono = "0.4.19"
+async-trait = "0.1.51"
+regex = "1"
+anyhow = "1.0"
+lazy_static = "1.4.0"
+tracing = "0.1"
+
+[build-dependencies]
+tonic-build = "0.4"

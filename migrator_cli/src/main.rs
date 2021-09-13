@@ -5,6 +5,7 @@ use tracing::*;
 use migrator_core::{util, reader};
 use migrator_core::clients::config::{Config, Driver};
 use migrator_core::archive::{Archive};
+use migrator_core::clients::driver::Driver;
 
 // cargo run -- --driver clickhouse --url http://localhost:8123 --migrations ../clickhouse_migrations
 #[tokio::main]

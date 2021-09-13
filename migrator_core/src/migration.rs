@@ -16,8 +16,7 @@ pub struct Migration {
     name: String,
     version: Option<i32>,
     sql: String,
-    checksum: u64,
-    executed_at: Option<DateTime<Local>>,
+    checksum: u64
 }
 
 impl std::fmt::Display for Migration {
@@ -72,8 +71,7 @@ impl Migration {
             name: name.to_string(),
             version: Some(version.unwrap_or(0)),
             checksum,
-            sql: content.to_string(),
-            executed_at: None
+            sql: content.to_string()
         }
     }
 
@@ -84,8 +82,7 @@ impl Migration {
             name: name.to_string(),
             version: Some(0),
             checksum,
-            sql: content.to_string(),
-            executed_at: None
+            sql: content.to_string()
         }
     }
 
@@ -128,10 +125,6 @@ impl Migration {
         &mut self.executed_at
     }
 
-    pub fn set_executed_at(&mut self) {
-        self.executed_at = Some(Local::now());
-    }
-
     pub fn bump_version(&mut self) {
         if self.version.is_none() {
             self.version = Some(1);
@@ -149,7 +142,7 @@ impl Migration {
     }
 
     pub fn to_insert_sql(&self) -> String {
-        let timestamp = self.executed_at.unwrap();
+        let timestamp = Local::now();
 
         let ts_seconds = timestamp.timestamp();
         let ts_nanos = timestamp.timestamp_subsec_nanos();

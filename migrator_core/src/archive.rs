@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use crate::migrator::Migration;
+use crate::migration::Migration;
 use crate::result::Result;
 use std::path::PathBuf;
 use crate::reader;
@@ -11,23 +11,23 @@ pub type MigrationArchive = HashMap<String, Vec<Migration>>;
 
 pub static MIGRATION_CACHE_DIR: &str = "/version_cache";
 
-pub struct Archive {
+pub struct LocalVersionArchive {
     path: Option<PathBuf>,
     dir: MigrationArchive,
 }
 
-impl From<Vec<Migration>> for Archive {
+impl From<Vec<Migration>> for LocalVersionArchive {
     fn from(files: Vec<Migration>) -> Self {
         let dir = parse_migrations_to_archive(files);
 
-        Archive {
+        LocalVersionArchive {
             dir,
             path: None
         }
     }
 }
 
-impl From<PathBuf> for Archive {
+impl From<PathBuf> for LocalVersionArchive {
     fn from(path: PathBuf) -> Self {
         let new_path = util::join_path(path, MIGRATION_CACHE_DIR);
 
@@ -38,7 +38,7 @@ impl From<PathBuf> for Archive {
 
         let dir = parse_migrations_to_archive(old_versions);
 
-        Archive {
+        LocalVersionArchive {
             dir,
             path: Some(new_path),
         }
@@ -61,16 +61,16 @@ fn parse_migrations_to_archive(files: Vec<Migration>) -> MigrationArchive {
     dir
 }
 
-impl Archive {
-    pub fn new(archive: MigrationArchive) -> Archive {
-        Archive {
+impl LocalVersionArchive {
+    pub fn new(archive: MigrationArchive) -> LocalVersionArchive {
+        LocalVersionArchive {
             dir: archive,
             path: None
         }
     }
 
-    pub fn default() -> Archive {
-        Archive {
+    pub fn default() -> LocalVersionArchive {
+        LocalVersionArchive {
             dir: MigrationArchive::new(),
             path: None
         }

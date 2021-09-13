@@ -1,11 +1,13 @@
 use crate::error::ErrorType;
 use crate::clients::traits::Transaction;
 use crate::clients::config::Config;
-use crate::migrator::{Migration, ExecutionReport};
+use crate::migration::{Migration, ExecutionReport};
+use clickhouse::{Client as ClickHouse};
 use crate::clients::CREATE_CLICKHOUSE_LOCK_TABLE_QUERY;
-use crate::archive::Archive;
+use crate::archive::LocalVersionArchive;
 use crate::result::Result;
 use tracing::*;
+use chrono::{DateTime, Local};
 
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub enum DriverType {
@@ -32,6 +34,13 @@ impl std::str::FromStr for DriverType {
     }
 }
 
+struct MigrationLockRow {
+    timestamp: DateTime<Local>,
+    name: String,
+    version: i32,
+    checksum: i64
+}
+
 pub struct Driver {
     client: Box<dyn Transaction>
 }
@@ -50,11 +59,21 @@ impl Driver {
         }
     }
 
-    pub async fn get_last_version(&self, _migration: &str) -> Result<()> {
-        Ok(())
+    pub async fn last_version(&mut self, migration: Migration) -> Result<Option<MigrationLockRow>> {
+        let entry = match self.client.fetch_one::<MigrationLockRow>(
+            &format!(
+                "SELECT * FROM migration_lock WHERE name = {} LIMIT 1",
+                migration.name()
+            )
+        ).await {
+            Ok(entry) => Some(entry),
+            Err(_e) => None
+        };
+
+        Ok(entry)
     }
 
-    pub async fn migrate(&mut self, migrations: Vec<Migration>, mut archive: Archive) -> Result<ExecutionReport> {
+    pub async fn migrate(&mut self, migrations: Vec<Migration>, mut archive: LocalVersionArchive) -> Result<ExecutionReport> {
         let mut ran_migrations = Vec::new();
 
         self.client.execute_query(CREATE_CLICKHOUSE_LOCK_TABLE_QUERY).await?;
@@ -70,8 +89,6 @@ impl Driver {
 
                 migration.set_version(latest_migration.next_version());
             }
-
-            migration.set_executed_at();
 
             self.client.execute_many(&[migration.sql(), &migration.to_insert_sql()]).await?;
 

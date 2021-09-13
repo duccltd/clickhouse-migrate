@@ -6,7 +6,7 @@ use crate::clients::driver::DriverType;
 #[derive(Debug, PartialEq, Clone)]
 pub struct Config {
     pub driver: DriverType,
-    pub uri: Option<String>,
+    uri: Option<String>,
     db_host: Option<String>,
     db_user_name: Option<String>,
     db_pass: Option<String>,

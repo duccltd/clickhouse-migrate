@@ -13,7 +13,8 @@ pub enum ErrorType {
     NonExistentMigrationVersions(String),
     InvalidMigrationName(String),
     InvalidParameter,
-    Clickhouse(Arc<clickhouse::error::Error>)
+    Clickhouse(Arc<clickhouse::error::Error>),
+    RowNotFound(String)
 }
 
 impl std::fmt::Display for ErrorType {
@@ -29,6 +30,7 @@ impl std::fmt::Display for ErrorType {
             ErrorType::FailedToExecuteMigration(ref m) => write!(f, "failed to execute migration {}", m),
             ErrorType::VersionCacheInvalidType(ref v) => write!(f, "invalid version {}", v),
             ErrorType::InvalidMigrationName(ref n) => write!(f, "invalid name: {}, must be x.sql or v1_x.sql", n),
+            ErrorType::RowNotFound(ref e) => write!(f, "could not find row {}", e),
             _ => write!(f, "An unexpected error has occurred"),
         }
     }

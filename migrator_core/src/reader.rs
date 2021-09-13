@@ -2,7 +2,7 @@ use walkdir::{WalkDir, DirEntry as WalkDirEntry};
 use std::path::{PathBuf};
 
 use crate::error::{ErrorType};
-use crate::migrator::Migration;
+use crate::migration::Migration;
 use crate::util;
 use crate::result::Result;
 use std::{fs};

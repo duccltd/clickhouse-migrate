@@ -8,4 +8,3 @@ pub mod migrator;
 pub mod reader;
 pub mod archive;
 pub mod result;
-pub mod cli;

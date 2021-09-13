@@ -1,4 +1,3 @@
-
 use std::collections::HashMap;
 use crate::migrator::Migration;
 use crate::result::Result;

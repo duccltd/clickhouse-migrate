@@ -9,15 +9,8 @@ default-run = "migration_cli"
 [dependencies]
 migrator_core = { version = "0.1.0", path = "../migrator_core" }
 structopt = { version = "0.3", default-features = false }
-itertools = "0.10.1"
-clickhouse = "0.7"
 tokio = {version = "1.4.0", features = ["full"] }
-walkdir = "2"
-chrono = "0.4.19"
-async-trait = "0.1.51"
-regex = "1"
 anyhow = "1.0"
-lazy_static = "1.4.0"
 tracing = "0.1"
 
 [build-dependencies]

@@ -105,27 +105,6 @@ impl LocalVersionArchive {
         Ok(())
     }
 
-    pub fn get_latest_version(&self, migration: &str) -> Option<Migration> {
-        let mut latest_migration: Option<Migration> = None;
-        if let Some(versions) =  self.get_migration_files(migration) {
-            let mut latest_version: Option<i32> = None;
-            for mut version in versions {
-                if version.version().is_none() {
-                    continue
-                }
-                let curr_version = version.version().unwrap();
-                if latest_version.is_none() {
-                    latest_version = Some(curr_version);
-                    latest_migration = Some(version);
-                } else if curr_version > latest_version.unwrap() {
-                    latest_version = Some(curr_version);
-                    latest_migration = Some(version);
-                }
-            }
-        }
-        latest_migration
-    }
-
     pub fn _rollback_version(&self, _migration: &str, _version: i32) -> Result<()> {
         unimplemented!("rollback not available yet");
     }

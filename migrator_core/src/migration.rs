@@ -121,10 +121,6 @@ impl Migration {
         &self.sql
     }
 
-    pub fn executed_at(&mut self) -> &Option<DateTime<Local>> {
-        &mut self.executed_at
-    }
-
     pub fn bump_version(&mut self) {
         if self.version.is_none() {
             self.version = Some(1);
@@ -133,12 +129,8 @@ impl Migration {
         }
     }
 
-    pub fn next_version(&self) -> i32 {
-        self.version.unwrap() + 1
-    }
-
-    pub fn set_version(&mut self, version: i32) {
-        self.version = Some(version);
+    pub fn set_version(&mut self, version: u32) {
+        self.version = Some(version as i32);
     }
 
     pub fn to_insert_sql(&self) -> String {

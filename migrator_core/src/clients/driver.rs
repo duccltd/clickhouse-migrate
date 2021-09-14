@@ -1,5 +1,5 @@
 use crate::error::ErrorType;
-use crate::clients::traits::Transaction;
+use crate::clients::traits::{Transaction, RowFetcher};
 use crate::clients::config::Config;
 use crate::migration::{Migration, ExecutionReport};
 use clickhouse::{Client as ClickHouse};
@@ -8,6 +8,8 @@ use crate::archive::LocalVersionArchive;
 use crate::result::Result;
 use tracing::*;
 use chrono::{DateTime, Local};
+use serde::Deserialize;
+use crate::clients::clickhouse::{MigrationLockRow, DatabaseClient};
 
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub enum DriverType {
@@ -34,15 +36,8 @@ impl std::str::FromStr for DriverType {
     }
 }
 
-struct MigrationLockRow {
-    timestamp: DateTime<Local>,
-    name: String,
-    version: i32,
-    checksum: i64
-}
-
 pub struct Driver {
-    client: Box<dyn Transaction>
+    client: Box<dyn DatabaseClient>
 }
 
 impl Driver {
@@ -59,18 +54,15 @@ impl Driver {
         }
     }
 
-    pub async fn last_version(&mut self, migration: Migration) -> Result<Option<MigrationLockRow>> {
-        let entry = match self.client.fetch_one::<MigrationLockRow>(
+    pub async fn last_version(&mut self, migration_name: &str) -> Result<Option<MigrationLockRow>> {
+        let entry = self.client.fetch_one(
             &format!(
                 "SELECT * FROM migration_lock WHERE name = {} LIMIT 1",
-                migration.name()
+                migration_name
             )
-        ).await {
-            Ok(entry) => Some(entry),
-            Err(_e) => None
-        };
+        ).await?;
 
-        Ok(entry)
+        Ok(Some(entry))
     }
 
     pub async fn migrate(&mut self, migrations: Vec<Migration>, mut archive: LocalVersionArchive) -> Result<ExecutionReport> {
@@ -79,11 +71,11 @@ impl Driver {
         self.client.execute_query(CREATE_CLICKHOUSE_LOCK_TABLE_QUERY).await?;
 
         for mut migration in migrations {
-            let latest_migration = archive.get_latest_version(migration.name());
+            let latest_migration = self.last_version(migration.name()).await?;
 
             if let Some(latest_migration) = latest_migration {
-                if migration.checksum() == latest_migration.checksum() {
-                    debug!("{} == {}", migration.checksum(), latest_migration.checksum());
+                if migration.checksum() == &latest_migration.checksum {
+                    debug!("{} == {}", migration.checksum(), latest_migration.checksum);
                     continue;
                 }
 

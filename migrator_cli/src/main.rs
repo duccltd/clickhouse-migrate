@@ -3,9 +3,9 @@ mod cli;
 use anyhow::Result;
 use tracing::*;
 use migrator_core::{util, reader};
-use migrator_core::clients::config::{Config, Driver};
-use migrator_core::archive::{Archive};
+use migrator_core::clients::config::{Config};
 use migrator_core::clients::driver::Driver;
+use migrator_core::archive::LocalVersionArchive;
 
 // cargo run -- --driver clickhouse --url http://localhost:8123 --migrations ../clickhouse_migrations
 #[tokio::main]
@@ -19,7 +19,7 @@ async fn main() -> Result<()> {
             let migrations = reader::find_migration_files(location.clone())
                 .expect("no migrations found");
 
-            let archive = Archive::from(location);
+            let archive = LocalVersionArchive::from(location);
 
             if let Ok(config) = Config::new(&driver) {
                 let config = config.uri(&url);

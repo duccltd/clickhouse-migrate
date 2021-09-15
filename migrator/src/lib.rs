@@ -1,0 +1,1 @@
+use migrator_core::migration::Migration;

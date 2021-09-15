@@ -111,6 +111,12 @@ pub struct Column {
     unique: bool
 }
 
+impl std::fmt::Display for Column {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        todo!()
+    }
+}
+
 impl Column {
     pub fn new(name: String, r#type: Types) -> Column {
         Column {

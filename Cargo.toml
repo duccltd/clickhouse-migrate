@@ -2,5 +2,6 @@
 members = [
     "migrator_cli",
     "migrator_core",
-    "migrator"
+    "migrator",
+    "migrator_macros"
 ]

@@ -5,7 +5,7 @@ use std::fmt::Formatter;
 pub enum Engines {
     MergeTree,
 
-    ReplicatedMergeTree,
+    ReplicatedMergeTree(String, String),
     ReplicatedSummingMergeTree,
     ReplicatedReplacingMergeTree,
     ReplicatedAggregatingMergeTree,
@@ -28,9 +28,10 @@ pub enum Engines {
 impl std::fmt::Display for Engines {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Engines::MergeTree => f.write_str("MergeTree"),
+            Engines::MergeTree => f.write_str("MergeTree()"),
 
-            Engines::ReplicatedMergeTree => f.write_str("ReplicatedMergeTree"),
+            /*
+            Engines::ReplicatedMergeTree(a, b) => {},
             Engines::ReplicatedSummingMergeTree => f.write_str("ReplicatedSummingMergeTree"),
             Engines::ReplicatedReplacingMergeTree => f.write_str("ReplicatedReplacingMergeTree"),
             Engines::ReplicatedAggregatingMergeTree => f.write_str("ReplicatedAggregatingMergeTree"),
@@ -44,10 +45,13 @@ impl std::fmt::Display for Engines {
             Engines::CollapsingMergeTree => f.write_str("CollapsingMergeTree"),
             Engines::VersionedCollapsingMergeTree => f.write_str("VersionedCollapsingMergeTree"),
             Engines::GraphiteMergeTree => f.write_str("GraphiteMergeTree"),
+             */
 
             Engines::StripeLog => f.write_str("StripeLog"),
             Engines::Log => f.write_str("Log"),
-            Engines::TinyLog => f.write_str("TinyLog")
+            Engines::TinyLog => f.write_str("TinyLog"),
+
+            _ => unimplemented!()
         }
     }
 }

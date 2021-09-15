@@ -3,6 +3,8 @@ use crate::result::Result;
 use std::str::FromStr;
 use crate::clients::driver::DriverType;
 
+// TODO: Config from url
+
 #[derive(Debug, PartialEq, Clone)]
 pub struct Config {
     pub driver: DriverType,

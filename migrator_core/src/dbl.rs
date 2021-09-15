@@ -8,7 +8,7 @@ use crate::result::Result;
 
 
 lazy_static! {
-    static ref REGEX: Regex = Regex::new(r"\b([vV]([0-9])_{1,2})?([A-z0-9]\w+).sql").unwrap();
+    static ref REGEX: Regex = Regex::new(r"^\b([vV]([0-9])_{1,2})?([A-z0-9]\w+).(sql|rs)$").unwrap();
 }
 
 #[derive(Debug, Clone)]
@@ -40,6 +40,8 @@ impl Into<MigrationFile> for PathBuf {
 
         if REGEX.is_match(&file_name) {
             let matches = REGEX.captures(&file_name).unwrap();
+
+            // let ext = matches.get(4)?;
 
             // Check to see if is versioned file
             return if matches.get(1).is_none() && matches.get(2).is_none() {

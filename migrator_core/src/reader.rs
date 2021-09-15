@@ -2,12 +2,12 @@ use walkdir::{WalkDir, DirEntry as WalkDirEntry};
 use std::path::{PathBuf};
 
 use crate::error::{ErrorType};
-use crate::migration::Migration;
+use crate::dbl::MigrationFile;
 use crate::util;
 use crate::result::Result;
 use std::{fs};
 
-pub fn find_migration_files(path: PathBuf) -> Result<Vec<Migration>> {
+pub fn find_migration_files(path: PathBuf) -> Result<Vec<MigrationFile>> {
     let file_paths = fs::read_dir(path)?
         .into_iter()
         .filter_map(|e| e.ok())
@@ -25,7 +25,7 @@ pub fn find_migration_files(path: PathBuf) -> Result<Vec<Migration>> {
 }
 
 
-pub fn fetch_migration_versions(path: PathBuf) -> Result<Vec<Migration>> {
+pub fn fetch_migration_versions(path: PathBuf) -> Result<Vec<MigrationFile>> {
     if !path.exists() {
         util::create_dir(path.as_path())?;
     } else if path.is_file() {

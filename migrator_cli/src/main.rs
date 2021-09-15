@@ -24,7 +24,7 @@ async fn main() -> Result<()> {
             if let Ok(config) = Config::new(&driver) {
                 let config = config.uri(&url);
 
-                let mut driver = Driver::new(config);
+                let mut driver = Driver::from_config(config);
 
                 let report = driver
                     .migrate(migrations, archive)

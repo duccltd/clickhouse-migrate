@@ -1,8 +1,8 @@
 [package]
-name = "migration_cli"
+name = "MigrationFile_cli"
 version = "0.1.0"
 edition = "2018"
-default-run = "migration_cli"
+default-run = "MigrationFile_cli"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

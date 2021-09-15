@@ -1,7 +1,7 @@
 use crate::error::ErrorType;
 use crate::clients::traits::{Transaction, RowFetcher};
 use crate::clients::config::Config;
-use crate::migration::{Migration, ExecutionReport};
+use crate::dbl::{Migration, ExecutionReport};
 use clickhouse::{Client as ClickHouse};
 use crate::clients::CREATE_CLICKHOUSE_LOCK_TABLE_QUERY;
 use crate::archive::LocalVersionArchive;
@@ -10,6 +10,7 @@ use tracing::*;
 use chrono::{DateTime, Local};
 use serde::Deserialize;
 use crate::clients::clickhouse::{MigrationLockRow, DatabaseClient};
+use crate::report::ExecutionReport;
 
 #[derive(Clone, Eq, PartialEq, Debug)]
 pub enum DriverType {
@@ -41,7 +42,13 @@ pub struct Driver {
 }
 
 impl Driver {
-    pub fn new(config: Config) -> Driver {
+    pub fn new(client: Box<dyn DatabaseClient>) -> Driver {
+        Driver {
+            client,
+        }
+    }
+
+    pub fn from_config(config: Config) -> Driver {
         let driver_type = config.driver.clone();
         let uri = config.build_uri();
 

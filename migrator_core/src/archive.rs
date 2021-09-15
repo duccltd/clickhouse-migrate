@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use crate::migration::Migration;
+use crate::dbl::MigrationFile;
 use crate::result::Result;
 use std::path::PathBuf;
 use crate::reader;
@@ -7,7 +7,7 @@ use crate::util;
 use std::collections::hash_map::Entry;
 use tracing::*;
 
-pub type MigrationArchive = HashMap<String, Vec<Migration>>;
+pub type MigrationArchive = HashMap<String, Vec<MigrationFile>>;
 
 pub static MIGRATION_CACHE_DIR: &str = "/version_cache";
 
@@ -16,8 +16,8 @@ pub struct LocalVersionArchive {
     dir: MigrationArchive,
 }
 
-impl From<Vec<Migration>> for LocalVersionArchive {
-    fn from(files: Vec<Migration>) -> Self {
+impl From<Vec<MigrationFile>> for LocalVersionArchive {
+    fn from(files: Vec<MigrationFile>) -> Self {
         let dir = parse_migrations_to_archive(files);
 
         LocalVersionArchive {
@@ -45,7 +45,7 @@ impl From<PathBuf> for LocalVersionArchive {
     }
 }
 
-fn parse_migrations_to_archive(files: Vec<Migration>) -> MigrationArchive {
+fn parse_migrations_to_archive(files: Vec<MigrationFile>) -> MigrationArchive {
     let mut dir = MigrationArchive::new();
     for migration in files.clone() {
         let file_name = migration.name().clone();
@@ -76,7 +76,7 @@ impl LocalVersionArchive {
         }
     }
 
-    pub fn get_migration_files(&self, migration: &str) -> Option<Vec<Migration>> {
+    pub fn get_migration_files(&self, migration: &str) -> Option<Vec<MigrationFile>> {
         let versioned_files = self.dir.get(migration)?;
 
         Some(versioned_files.clone())
@@ -86,7 +86,7 @@ impl LocalVersionArchive {
         Ok(())
     }
 
-    pub fn add_migration_version(&mut self, migration: Migration) -> Result<()> {
+    pub fn add_migration_version(&mut self, migration: MigrationFile) -> Result<()> {
         let migration_name = migration.name().clone();
 
         if self.path.is_some() {

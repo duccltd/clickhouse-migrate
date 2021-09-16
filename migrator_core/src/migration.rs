@@ -25,31 +25,31 @@ pub enum Engines {
     TinyLog
 }
 
-impl std::fmt::Display for Engines {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+impl Engines {
+    pub fn as_str(&self) -> &'static str {
         match self {
-            Engines::MergeTree => f.write_str("MergeTree()"),
+            Engines::MergeTree => "MergeTree()",
 
             /*
             Engines::ReplicatedMergeTree(a, b) => {},
-            Engines::ReplicatedSummingMergeTree => f.write_str("ReplicatedSummingMergeTree"),
-            Engines::ReplicatedReplacingMergeTree => f.write_str("ReplicatedReplacingMergeTree"),
-            Engines::ReplicatedAggregatingMergeTree => f.write_str("ReplicatedAggregatingMergeTree"),
-            Engines::ReplicatedCollapsingMergeTree => f.write_str("ReplicatedCollapsingMergeTree"),
-            Engines::ReplicatedVersionedCollapsingMergeTree => f.write_str("ReplicatedVersionedCollapsingMergeTree"),
-            Engines::ReplicatedGraphiteMergeTree => f.write_str("ReplicatedGraphiteMergeTree"),
+            Engines::ReplicatedSummingMergeTree => "ReplicatedSummingMergeTree",
+            Engines::ReplicatedReplacingMergeTree => "ReplicatedReplacingMergeTree",
+            Engines::ReplicatedAggregatingMergeTree => "ReplicatedAggregatingMergeTree",
+            Engines::ReplicatedCollapsingMergeTree => "ReplicatedCollapsingMergeTree",
+            Engines::ReplicatedVersionedCollapsingMergeTree => "ReplicatedVersionedCollapsingMergeTree",
+            Engines::ReplicatedGraphiteMergeTree => "ReplicatedGraphiteMergeTree",
 
-            Engines::ReplacingMergeTree => f.write_str("ReplacingMergeTree"),
-            Engines::SummingMergeTree => f.write_str("SummingMergeTree"),
-            Engines::AggregatingMergeTree => f.write_str("AggregatingMergeTree"),
-            Engines::CollapsingMergeTree => f.write_str("CollapsingMergeTree"),
-            Engines::VersionedCollapsingMergeTree => f.write_str("VersionedCollapsingMergeTree"),
-            Engines::GraphiteMergeTree => f.write_str("GraphiteMergeTree"),
+            Engines::ReplacingMergeTree => "ReplacingMergeTree",
+            Engines::SummingMergeTree => "SummingMergeTree",
+            Engines::AggregatingMergeTree => "AggregatingMergeTree",
+            Engines::CollapsingMergeTree => "CollapsingMergeTree",
+            Engines::VersionedCollapsingMergeTree => "VersionedCollapsingMergeTree",
+            Engines::GraphiteMergeTree => "GraphiteMergeTree",
              */
 
-            Engines::StripeLog => f.write_str("StripeLog"),
-            Engines::Log => f.write_str("Log"),
-            Engines::TinyLog => f.write_str("TinyLog"),
+            Engines::StripeLog => "StripeLog",
+            Engines::Log => "Log",
+            Engines::TinyLog => "TinyLog",
 
             _ => unimplemented!()
         }

@@ -32,6 +32,10 @@ impl Table {
 
         &mut column
     }
+
+    pub fn as_str(&self) -> &'static str {
+        unimplemented!("table to raw form")
+    }
 }
 
 pub enum Types {
@@ -66,32 +70,32 @@ pub enum Types {
     Enum,
 }
 
-impl std::fmt::Display for Types {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Types::Int8 => f.write_str("Int8"),
-            Types::Int16 => f.write_str("Int16"),
-            Types::Int32 => f.write_str("Int32"),
-            Types::Int64 => f.write_str("Int64"),
-            Types::Int128 => f.write_str("Int128"),
-            Types::Int256 => f.write_str("Int256"),
-            Types::UInt8 => f.write_str("UInt8"),
+impl Types {
+    pub fn as_str(&self) -> &'static str {
+        match *self {
+            Types::Int8 => "Int8",
+            Types::Int16 => "Int16",
+            Types::Int32 => "Int32",
+            Types::Int64 => "Int64",
+            Types::Int128 => "Int128",
+            Types::Int256 => "Int256",
+            Types::UInt8 => "UInt8",
 
-            Types::UInt16 => f.write_str("UInt16"),
-            Types::UInt32 => f.write_str("UInt32"),
-            Types::UInt64 => f.write_str("UInt64"),
-            Types::UInt128 => f.write_str("UInt128"),
-            Types::UInt256 => f.write_str("UInt256"),
-            Types::Float32 => f.write_str("Float32"),
-            Types::Float64 => f.write_str("Float64"),
-            Types::Decimal32 => f.write_str("Decimal32"),
-            Types::Decimal64 => f.write_str("Decimal64"),
-            Types::Decimal128 => f.write_str("Decimal128"),
-            Types::Decimal256 => f.write_str("Decimal256"),
-            Types::Varchar(length) => f.write_str(&format!("VARCHAR({})", &length.to_string())),
-            Types::UUID => f.write_str("UUID"),
-            Types::Date => f.write_str("Date"),
-            Types::Date32 => f.write_str("Date32"),
+            Types::UInt16 => "UInt16",
+            Types::UInt32 => "UInt32",
+            Types::UInt64 => "UInt64",
+            Types::UInt128 => "UInt128",
+            Types::UInt256 => "UInt256",
+            Types::Float32 => "Float32",
+            Types::Float64 => "Float64",
+            Types::Decimal32 => "Decimal32",
+            Types::Decimal64 => "Decimal64",
+            Types::Decimal128 => "Decimal128",
+            Types::Decimal256 => "Decimal256",
+            Types::Varchar(length) => &format!("VARCHAR({})", &length.to_string()),
+            Types::UUID => "UUID",
+            Types::Date => "Date",
+            Types::Date32 => "Date32",
 
             // TODO: DateTime types
             Types::DateTime(region) => format!("DateTime({})", region),
@@ -106,15 +110,7 @@ impl std::fmt::Display for Types {
 pub struct Column {
     name: String,
     r#type: Types,
-    primary: bool,
     nullable: bool,
-    unique: bool
-}
-
-impl std::fmt::Display for Column {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        todo!()
-    }
 }
 
 impl Column {
@@ -122,23 +118,7 @@ impl Column {
         Column {
             name,
             r#type,
-            primary: false,
-            unique: false,
             nullable: true
-        }
-    }
-
-    pub fn primary(self) -> Column {
-        Self {
-            primary: true,
-            ..self
-        }
-    }
-
-    pub fn unique(self) -> Column {
-        Self {
-            unique: true,
-            ..self
         }
     }
 
@@ -147,5 +127,14 @@ impl Column {
             nullable: false,
             ..self
         }
+    }
+
+    pub fn as_str(&self) -> &'static str {
+        let entry: &str = &format!("{} {}", self.name, self.r#type.as_str());
+        if !self.nullable {
+            entry = entry + " NOT NULL "
+        }
+
+        &entry[0..entry.len() - 1]
     }
 }

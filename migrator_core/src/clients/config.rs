@@ -2,8 +2,8 @@ use crate::error::{ErrorType};
 use crate::result::Result;
 use std::str::FromStr;
 use crate::clients::driver::DriverType;
-
-// TODO: Config from url
+use url::{Url};
+use std::borrow::Cow;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Config {
@@ -14,6 +14,25 @@ pub struct Config {
     db_pass: Option<String>,
     db_port: Option<i32>,
     db_database: Option<String>,
+}
+
+impl From<Url> for Config {
+    fn from(url: Url) -> Self {
+        let query = url.query_pairs();
+
+        for (key, value) in query {
+            match key {
+                Cow::from("username") => {
+
+                }
+                _ => {}
+            }
+        }
+
+        Config {
+
+        }
+    }
 }
 
 impl Config {

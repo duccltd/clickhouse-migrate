@@ -9,5 +9,5 @@ proc-macro = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-migration_core = { version = "0.1.0", path = "../migrator_core" }
+migrator_core = { version = "0.1.0", path = "../migrator_core" }
 proc-macro2 = "1"

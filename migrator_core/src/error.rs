@@ -17,7 +17,7 @@ pub enum ErrorType {
     InvalidParameter,
     Clickhouse(Arc<clickhouse::error::Error>),
     RowNotFound(String),
-    MissingConfigDefinition(String)
+    MissingConfigDefinition(String),
 }
 
 impl std::fmt::Display for ErrorType {
@@ -28,15 +28,29 @@ impl std::fmt::Display for ErrorType {
             ErrorType::Clickhouse(ref e) => write!(f, "Clickhouse error: {}", e),
             ErrorType::InvalidDriverType(ref d) => write!(f, "invalid driver type {}", d),
             ErrorType::InvalidDriver => write!(f, "invalid driver provided"),
-            ErrorType::FailedToReadMigration(ref e, ref m) => write!(f, "failed to read migration {} - {}", m, e),
-            ErrorType::FailedToWriteMigration(ref e, ref m) => write!(f, "failed to write migration {} - {}", m, e),
-            ErrorType::FailedToExecuteMigration(ref m) => write!(f, "failed to execute migration {}", m),
+            ErrorType::FailedToReadMigration(ref e, ref m) => {
+                write!(f, "failed to read migration {} - {}", m, e)
+            }
+            ErrorType::FailedToWriteMigration(ref e, ref m) => {
+                write!(f, "failed to write migration {} - {}", m, e)
+            }
+            ErrorType::FailedToExecuteMigration(ref m) => {
+                write!(f, "failed to execute migration {}", m)
+            }
             ErrorType::VersionCacheInvalidType(ref v) => write!(f, "invalid version {}", v),
-            ErrorType::InvalidMigrationName(ref n) => write!(f, "invalid name: {}, must be x.sql or v1_x.sql", n),
+            ErrorType::InvalidMigrationName(ref n) => {
+                write!(f, "invalid name: {}, must be x.sql or v1_x.sql", n)
+            }
             ErrorType::RowNotFound(ref e) => write!(f, "could not find row {}", e),
-            ErrorType::UnableToWriteConfig(ref err) => write!(f, "Unable to write configuration: {}", err),
-            ErrorType::UnableToReadConfig(ref err) => write!(f, "Unable to read configuration: {:?}", err),
-            ErrorType::MissingConfigDefinition(ref e) => write!(f, "Could not find config definition: {:?}", e),
+            ErrorType::UnableToWriteConfig(ref err) => {
+                write!(f, "Unable to write configuration: {}", err)
+            }
+            ErrorType::UnableToReadConfig(ref err) => {
+                write!(f, "Unable to read configuration: {:?}", err)
+            }
+            ErrorType::MissingConfigDefinition(ref e) => {
+                write!(f, "Could not find config definition: {:?}", e)
+            }
             _ => write!(f, "An unexpected error has occurred"),
         }
     }

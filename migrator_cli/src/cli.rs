@@ -6,7 +6,7 @@ pub enum Opts {
     // Setup the migration tool
     Setup(Setup),
 
-    Migrate(Migrate)
+    Migrate(Migrate),
 }
 
 #[derive(Debug, StructOpt)]
@@ -15,13 +15,13 @@ pub enum Migrate {
     Make(MigrateMake),
 
     // Migrate to latest
-    Latest
+    Latest,
 }
 
 #[derive(Debug, StructOpt)]
 pub struct MigrateMake {
     #[structopt(short, long, help = "Name of the migration")]
-    pub name: String
+    pub name: String,
 }
 
 #[derive(Debug, StructOpt)]

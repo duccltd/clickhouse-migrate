@@ -1,9 +1,9 @@
 mod cli;
 
-use tracing::*;
-use migrator_core::{util, reader, error::ErrorType, result::Result, migration::MigrationFile};
 use migrator_core::clients::config;
 use migrator_core::clients::driver::Driver;
+use migrator_core::{error::ErrorType, migration::MigrationFile, reader, result::Result, util};
+use tracing::*;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -43,26 +43,36 @@ async fn main() -> Result<()> {
             cli::Setup::View => {
                 info!("{:?}", config);
             }
-        }
+        },
         cli::Opts::Migrate(params) => match params {
             cli::Migrate::Make(params) => {
                 let migrations = match config.migrations {
                     Some(migrations) => migrations,
-                    None => return Err(ErrorType::MissingConfigDefinition("Missing migrations definition".into()))
+                    None => {
+                        return Err(ErrorType::MissingConfigDefinition(
+                            "Missing migrations definition".into(),
+                        ))
+                    }
                 };
 
-                MigrationFile::create(migrations, params.name).expect("unable to write migration file")
+                MigrationFile::create(migrations, params.name)
+                    .expect("unable to write migration file")
             }
             cli::Migrate::Latest => {
                 let migrations = match &config.migrations {
                     Some(migrations) => migrations,
-                    None => return Err(ErrorType::MissingConfigDefinition("Missing migrations definition".into()))
+                    None => {
+                        return Err(ErrorType::MissingConfigDefinition(
+                            "Missing migrations definition".into(),
+                        ))
+                    }
                 };
 
-                let location = util::standardise_path(&migrations).expect("Unable to standardise path.");
+                let location =
+                    util::standardise_path(&migrations).expect("Unable to standardise path.");
 
-                let migrations = reader::find_migration_files(location.clone())
-                    .expect("no migrations found");
+                let migrations =
+                    reader::find_migration_files(location.clone()).expect("no migrations found");
 
                 let mut driver = Driver::from_config(config);
 
@@ -73,7 +83,7 @@ async fn main() -> Result<()> {
 
                 info!("{}", report);
             }
-        }
+        },
     }
 
     Ok(())

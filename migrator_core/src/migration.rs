@@ -1,16 +1,16 @@
-use chrono::{Local};
+use chrono::Local;
 use std::fmt::Formatter;
 
-use std::path::PathBuf;
-use crate::util::{write_file, calculate_hash};
 use crate::result::Result;
-use std::hash::{Hash};
+use crate::util::{calculate_hash, write_file};
+use std::hash::Hash;
+use std::path::PathBuf;
 use tracing::*;
 
 #[derive(Debug, Clone, Hash)]
 pub struct MigrationFile {
     pub name: String,
-    pub sql: String
+    pub sql: String,
 }
 
 impl std::fmt::Display for MigrationFile {
@@ -21,13 +21,9 @@ impl std::fmt::Display for MigrationFile {
 
 impl Into<MigrationFile> for PathBuf {
     fn into(self) -> MigrationFile {
-        let file_name = String::from(self.file_name()
-            .and_then(|name| name.to_str())
-            .unwrap());
+        let file_name = String::from(self.file_name().and_then(|name| name.to_str()).unwrap());
 
-        let content = std::fs::read_to_string(
-            self.as_path()
-        ).unwrap_or("".to_string());
+        let content = std::fs::read_to_string(self.as_path()).unwrap_or("".to_string());
 
         MigrationFile::new(&file_name, &content)
     }
@@ -37,23 +33,25 @@ impl MigrationFile {
     pub fn new(name: &str, content: &str) -> MigrationFile {
         MigrationFile {
             name: name.to_string(),
-            sql: content.to_string()
+            sql: content.to_string(),
         }
     }
 
     pub fn create(directory: String, name: String) -> Result<()> {
         let new_name = name.replace(" ", "-");
-        let file_name = format!("{}_{}.sql", Local::now().format("%Y%m%d%H%M%S"), &new_name);
+        let file_name = format!("{}_{}", Local::now().format("%Y%m%d%H%M%S"), &new_name);
 
-        let path = PathBuf::from(format!("{}/{}", &directory, &file_name));
+        let up_path = PathBuf::from(format!("{}/{}.up.sql", &directory, &file_name));
+        let down_path = PathBuf::from(format!("{}/{}.down.sql", &directory, &file_name));
 
-        write_file(path, &vec![])?;
+        write_file(up_path, &vec![])?;
+        write_file(down_path, &vec![])?;
 
         info!("Created new migration: {}", file_name);
 
         Ok(())
     }
-    
+
     pub fn checksum(&self) -> u64 {
         calculate_hash(self)
     }
@@ -67,7 +65,7 @@ impl MigrationFile {
         let entry = ((ts_seconds as u64) * 1_000_000_000) + (ts_nanos as u64);
 
         format!(
-            "INSERT INTO migration_lock (*) VALUES ({}, '{}', '{}')",
+            "INSERT INTO clickhouse_migrations (*) VALUES ({}, '{}', '{}')",
             entry,
             self.name,
             self.checksum()

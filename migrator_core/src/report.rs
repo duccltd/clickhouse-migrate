@@ -8,9 +8,7 @@ pub struct ExecutionReport {
 
 impl ExecutionReport {
     pub fn new(ran_migrations: Vec<MigrationFile>) -> Self {
-        ExecutionReport {
-            ran_migrations
-        }
+        ExecutionReport { ran_migrations }
     }
 }
 

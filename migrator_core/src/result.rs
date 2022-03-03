@@ -1,4 +1,4 @@
-use crate::error::{ErrorType};
+use crate::error::ErrorType;
 
 pub type Result<T> = std::result::Result<T, ErrorType>;
 

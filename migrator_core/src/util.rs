@@ -1,7 +1,7 @@
-use std::path::{PathBuf, Path};
+use crate::result::IOResult;
 use std::fs::File;
 use std::io::Write;
-use crate::result::{IOResult};
+use std::path::{Path, PathBuf};
 
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};

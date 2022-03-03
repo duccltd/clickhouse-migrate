@@ -1,12 +1,12 @@
-use crate::error::{ErrorType};
-use crate::result::Result;
-use std::str::FromStr;
 use crate::clients::driver::DriverType;
+use crate::error::ErrorType;
+use crate::result::Result;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
+use std::str::FromStr;
 
 fn config_filename() -> &'static str {
-  "clickhouse.toml"
+    "clickhouse.toml"
 }
 
 fn config_path() -> Result<String> {
@@ -46,7 +46,7 @@ impl std::default::Default for Config {
             db_user_name: None,
             db_pass: None,
             db_port: None,
-            db_database: None
+            db_database: None,
         }
     }
 }
@@ -63,7 +63,7 @@ impl Config {
             db_user_name: None,
             db_pass: None,
             db_port: None,
-            db_database: None
+            db_database: None,
         })
     }
 
@@ -117,7 +117,12 @@ impl Config {
 
             let mut url: String = driver.prefix().to_string() + "://";
 
-            url = url + if let Some(host) = &self.db_host { host } else { "localhost" };
+            url = url
+                + if let Some(host) = &self.db_host {
+                    host
+                } else {
+                    "localhost"
+                };
 
             if let Some(port) = &self.db_port {
                 url = url + &format!(":{}/", port.to_string().as_str());

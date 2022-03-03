@@ -1,18 +1,23 @@
-use crate::clients::traits::{Transaction, RowFetcher};
-use clickhouse::{Client as ClickHouse, Row as ClickhouseRow};
-use async_trait::async_trait;
+use crate::clients::traits::{RowFetcher, Transaction};
 use crate::result::Result;
+use async_trait::async_trait;
+use clickhouse::{Client as ClickHouse, Row as ClickhouseRow};
 use serde::{Deserialize, Serialize};
 
-pub trait DatabaseClient: Transaction + RowFetcher<MigrationLockRow> {}
+pub trait DatabaseClient: Transaction + RowFetcher<MigrationsRow> + RowFetcher<LockRow> {}
 
-impl <T: Transaction + RowFetcher<MigrationLockRow>> DatabaseClient for T {}
+impl<T: Transaction + RowFetcher<MigrationsRow> + RowFetcher<LockRow>> DatabaseClient for T {}
 
 #[derive(Debug, ClickhouseRow, Deserialize, Serialize)]
-pub struct MigrationLockRow {
+pub struct MigrationsRow {
     pub timestamp: u64,
     pub name: String,
-    pub checksum: String
+    pub checksum: String,
+}
+
+#[derive(Debug, ClickhouseRow, Deserialize, Serialize)]
+pub struct LockRow {
+    pub is_locked: u8,
 }
 
 #[async_trait]
@@ -31,19 +36,30 @@ impl Transaction for ClickHouse {
 }
 
 #[async_trait]
-impl RowFetcher<MigrationLockRow> for ClickHouse {
-    async fn fetch_one(&mut self, query: &str) -> Result<MigrationLockRow> {
-        let row = self.query(query)
-            .fetch_one::<MigrationLockRow>()
-            .await?;
+impl RowFetcher<LockRow> for ClickHouse {
+    async fn fetch_one(&mut self, query: &str) -> Result<LockRow> {
+        let row = self.query(query).fetch_one::<LockRow>().await?;
 
         Ok(row)
     }
 
-    async fn fetch_many(&mut self, query: &str) -> Result<Vec<MigrationLockRow>> {
-        let rows = self.query(query)
-            .fetch_all::<MigrationLockRow>()
-            .await?;
+    async fn fetch_many(&mut self, query: &str) -> Result<Vec<LockRow>> {
+        let rows = self.query(query).fetch_all::<LockRow>().await?;
+
+        Ok(rows)
+    }
+}
+
+#[async_trait]
+impl RowFetcher<MigrationsRow> for ClickHouse {
+    async fn fetch_one(&mut self, query: &str) -> Result<MigrationsRow> {
+        let row = self.query(query).fetch_one::<MigrationsRow>().await?;
+
+        Ok(row)
+    }
+
+    async fn fetch_many(&mut self, query: &str) -> Result<Vec<MigrationsRow>> {
+        let rows = self.query(query).fetch_all::<MigrationsRow>().await?;
 
         Ok(rows)
     }

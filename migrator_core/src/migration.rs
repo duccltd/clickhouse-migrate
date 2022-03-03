@@ -29,19 +29,12 @@ impl Into<MigrationFile> for PathBuf {
             self.as_path()
         ).unwrap_or("".to_string());
 
-        MigrationFile::default(&file_name, &content)
+        MigrationFile::new(&file_name, &content)
     }
 }
 
 impl MigrationFile {
     pub fn new(name: &str, content: &str) -> MigrationFile {
-        MigrationFile {
-            name: name.to_string(),
-            sql: content.to_string()
-        }
-    }
-
-    pub fn default(name: &str, content: &str) -> MigrationFile {
         MigrationFile {
             name: name.to_string(),
             sql: content.to_string()
@@ -60,25 +53,9 @@ impl MigrationFile {
 
         Ok(())
     }
-
-    pub fn to_display(&self) -> String {
-        let mut name: String = String::from("/v");
-
-        name = name + &self.name + ".sql";
-
-        name
-    }
-
-    pub fn name(&self) -> &String {
-        &self.name
-    }
-
+    
     pub fn checksum(&self) -> u64 {
         calculate_hash(self)
-    }
-
-    pub fn sql(&self) -> &String {
-        &self.sql
     }
 
     pub fn to_insert_sql(&self) -> String {

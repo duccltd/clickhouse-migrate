@@ -1,4 +1,4 @@
-use crate::dbl::MigrationFile;
+use crate::migration::MigrationFile;
 use std::fmt::Formatter;
 
 #[derive(Debug, Clone)]

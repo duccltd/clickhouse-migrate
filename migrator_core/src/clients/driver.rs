@@ -1,6 +1,6 @@
 use crate::error::ErrorType;
 use crate::clients::config::Config;
-use crate::dbl::{MigrationFile};
+use crate::migration::{MigrationFile};
 use clickhouse::{Client as ClickHouse};
 use crate::clients::CREATE_CLICKHOUSE_LOCK_TABLE_QUERY;
 use crate::result::Result;
@@ -87,25 +87,27 @@ impl Driver {
             }
 
             // Check if valid file
-            if migration.sql() == "" {
-                panic!("{}. Empty migration file.", migration.name());
+            if &migration.sql == "" {
+                panic!("{}. Empty migration file.", &migration.name);
             }
 
             new_migrations.push(migration);
         }
 
+        // Check if any migrations are missing
         if (migrations.len() - new_migrations.len()) != run_migrations.len() {
             let missing_migrations: Vec<&String> = run_migrations.iter().filter(|rm| migrations.iter().find(|om| om.name == rm.name).is_none()).map(|em| &em.name).collect();
 
             panic!("Migration directory is corrupt. Missing following files: {:?}", missing_migrations);
         }
 
+        // Create the new ones
         for migration in new_migrations {
-            self.client.execute_many(&[migration.sql(), &migration.to_insert_sql()]).await?;
+            self.client.execute_many(&[&migration.sql, &migration.to_insert_sql()]).await?;
 
             ran_migrations.push(migration.clone());
 
-            debug!("Ran migration {}", migration.name())
+            debug!("Ran migration {}", &migration.name)
         }
 
         Ok(ExecutionReport::new(ran_migrations))

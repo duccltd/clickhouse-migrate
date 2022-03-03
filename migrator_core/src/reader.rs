@@ -1,6 +1,6 @@
 use std::path::{PathBuf};
 
-use crate::dbl::MigrationFile;
+use crate::migration::MigrationFile;
 use crate::result::Result;
 use std::{fs};
 

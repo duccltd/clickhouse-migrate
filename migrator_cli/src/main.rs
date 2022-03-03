@@ -1,7 +1,7 @@
 mod cli;
 
 use tracing::*;
-use migrator_core::{util, reader, error::ErrorType, result::Result, dbl::MigrationFile};
+use migrator_core::{util, reader, error::ErrorType, result::Result, migration::MigrationFile};
 use migrator_core::clients::config;
 use migrator_core::clients::driver::Driver;
 

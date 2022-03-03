@@ -4,18 +4,25 @@ use std::str::FromStr;
 use crate::clients::driver::DriverType;
 use url::{Url};
 use std::borrow::Cow;
-use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
-
-lazy_static! {
-    pub static ref CONFIGURATION_PATH: String = std::env::var("CONFIGURATION_PATH")
-        .unwrap_or_else(|_| "clickhouse-migrator.toml".to_owned());
-}
+use std::path::Path;
 
 const VERSION: &str = "0.1.0";
 
+fn config_filename() -> &'static str {
+  "clickhouse.toml"
+}
+
+fn config_path() -> Result<String> {
+    let base = std::env::current_dir()?;
+
+    Ok(format!("{}/{}", base.display(), config_filename()))
+}
+
 pub fn load_config() -> Result<Config> {
-    match confy::load::<Config>(&CONFIGURATION_PATH.to_string()) {
+    let path = config_path()?;
+
+    match confy::load_path(&Path::new(&path)) {
         Ok(res) => Ok(res),
         Err(e) => Err(ErrorType::UnableToReadConfig(e)),
     }
@@ -135,6 +142,8 @@ impl Config {
     }
 
     pub fn write(&self) -> Result<()> {
-        confy::store(&CONFIGURATION_PATH.to_string(), self).map_err(ErrorType::UnableToWriteConfig)
+        let path = config_path()?;
+
+        confy::store_path(&Path::new(&path), self).map_err(ErrorType::UnableToWriteConfig)
     }
 }

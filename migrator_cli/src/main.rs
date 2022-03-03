@@ -16,6 +16,14 @@ async fn main() -> Result<()> {
 
     match opts {
         cli::Opts::Setup(params) => match params {
+            cli::Setup::Init => {
+                // let default = config::Config::default();
+
+                // match default.write() {
+                //     Ok(()) => info!("Config file has been created."),
+                //     Err(e) => panic!("writing config file: {}", e),
+                // }
+            }
             cli::Setup::Set(set) => {
                 let mut changed = false;
 

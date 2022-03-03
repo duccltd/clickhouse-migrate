@@ -16,6 +16,8 @@ pub enum Migrate {
 
 #[derive(Debug, StructOpt)]
 pub enum Setup {
+    Init,
+
     Set(Set),
 
     View,

@@ -62,4 +62,5 @@ RUST_LOG=info clickhouse-migrate migrate latest
 ## Currently known to be unsupported
 
 - Will always create a new configuration and wont check if there is one present
-- Running migrations can collide, need a table to call a migration lock so they can't run in parallel
+- Running migrations can collide, needs to lock a table
+- Needs a way to revert a migration, no down functionality

@@ -11,7 +11,17 @@ pub enum Opts {
 
 #[derive(Debug, StructOpt)]
 pub enum Migrate {
+    // Create a migration
+    Make(MigrateMake),
+
+    // Migrate to latest
     Latest
+}
+
+#[derive(Debug, StructOpt)]
+pub struct MigrateMake {
+    #[structopt(short, long, help = "Name of the migration")]
+    pub name: String
 }
 
 #[derive(Debug, StructOpt)]

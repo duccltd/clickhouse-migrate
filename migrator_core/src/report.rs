@@ -17,7 +17,7 @@ impl ExecutionReport {
 impl std::fmt::Display for ExecutionReport {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         for migration in &self.ran_migrations {
-            writeln!(f, "{}", migration);
+            writeln!(f, "{}", migration)?;
         }
         writeln!(f, "{} migrations", &self.ran_migrations.len())
     }

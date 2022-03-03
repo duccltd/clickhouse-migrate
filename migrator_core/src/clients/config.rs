@@ -2,12 +2,8 @@ use crate::error::{ErrorType};
 use crate::result::Result;
 use std::str::FromStr;
 use crate::clients::driver::DriverType;
-use url::{Url};
-use std::borrow::Cow;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
-
-const VERSION: &str = "0.1.0";
 
 fn config_filename() -> &'static str {
   "clickhouse.toml"

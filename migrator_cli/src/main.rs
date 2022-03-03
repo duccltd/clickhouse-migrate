@@ -1,7 +1,7 @@
 mod cli;
 
 use tracing::*;
-use migrator_core::{util, reader, error::ErrorType, result::Result};
+use migrator_core::{util, reader, error::ErrorType, result::Result, dbl::MigrationFile};
 use migrator_core::clients::config;
 use migrator_core::clients::driver::Driver;
 
@@ -45,13 +45,21 @@ async fn main() -> Result<()> {
             }
         }
         cli::Opts::Migrate(params) => match params {
+            cli::Migrate::Make(params) => {
+                let migrations = match config.migrations {
+                    Some(migrations) => migrations,
+                    None => return Err(ErrorType::MissingConfigDefinition("Missing migrations definition".into()))
+                };
+
+                MigrationFile::create(migrations, params.name).expect("unable to write migration file")
+            }
             cli::Migrate::Latest => {
                 let migrations = match &config.migrations {
                     Some(migrations) => migrations,
                     None => return Err(ErrorType::MissingConfigDefinition("Missing migrations definition".into()))
                 };
 
-                let location = util::standardise_path(&migrations);
+                let location = util::standardise_path(&migrations).expect("Unable to standardise path.");
 
                 let migrations = reader::find_migration_files(location.clone())
                     .expect("no migrations found");

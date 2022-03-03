@@ -15,7 +15,6 @@ chrono = "0.4.19"
 async-trait = "0.1.51"
 regex = "1"
 anyhow = "1.0"
-lazy_static = "1.4.0"
 tracing = "0.1"
 tracing-log = "0.1.2"
 tracing-subscriber = { version = "0.2", features = ["tracing-log"] }

@@ -1,9 +1,8 @@
-use chrono::{DateTime, Local};
+use chrono::{Local};
 use std::fmt::Formatter;
 
-use regex::Regex;
 use std::path::PathBuf;
-use crate::util::{write_file, calculate_hash, create_path};
+use crate::util::{write_file, calculate_hash};
 use crate::result::Result;
 use std::hash::{Hash};
 
@@ -48,10 +47,12 @@ impl MigrationFile {
         }
     }
 
-    pub fn write(&self, location: PathBuf) -> Result<()> {
-        let location = create_path(location, &self.to_display());
+    pub fn create(directory: String, name: String) -> Result<()> {
+        let new_name = name.replace(" ", "-");
 
-        write_file(location, self.sql.as_bytes())?;
+        let path = PathBuf::from(format!("{}/{}_{}.sql", &directory, Local::now().format("%Y%m%d%H%M%S"), &new_name));
+
+        write_file(path, &vec![])?;
 
         Ok(())
     }

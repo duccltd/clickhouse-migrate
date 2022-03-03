@@ -1,12 +1,10 @@
 use crate::error::ErrorType;
-use crate::clients::traits::{Transaction, RowFetcher};
 use crate::clients::config::Config;
 use crate::dbl::{MigrationFile};
 use clickhouse::{Client as ClickHouse};
 use crate::clients::CREATE_CLICKHOUSE_LOCK_TABLE_QUERY;
 use crate::result::Result;
 use tracing::*;
-use chrono::{DateTime, Local};
 use crate::clients::clickhouse::{MigrationLockRow, DatabaseClient};
 use crate::report::ExecutionReport;
 use serde::{Deserialize, Serialize};
@@ -73,7 +71,7 @@ impl Driver {
 
         let run_migrations = self.run_migrations().await?;
 
-        for mut migration in migrations {
+        for migration in &migrations {
             let existing = &run_migrations.iter().find(|m| m.name == migration.name);
 
             // Skip if this has already been run
@@ -85,6 +83,13 @@ impl Driver {
                 continue;
             }
 
+            // Check if valid file
+            if migration.sql() == "" {
+                panic!("{}. Empty migration file.", migration.name());
+            }
+        }
+
+        for migration in &migrations {
             self.client.execute_many(&[migration.sql(), &migration.to_insert_sql()]).await?;
 
             ran_migrations.push(migration.clone());

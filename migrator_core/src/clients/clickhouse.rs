@@ -2,8 +2,6 @@ use crate::clients::traits::{Transaction, RowFetcher};
 use clickhouse::{Client as ClickHouse, Row as ClickhouseRow};
 use async_trait::async_trait;
 use crate::result::Result;
-use crate::error::ErrorType;
-use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
 
 pub trait DatabaseClient: Transaction + RowFetcher<MigrationLockRow> {}

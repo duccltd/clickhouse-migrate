@@ -1,18 +1,18 @@
 use crate::error::ErrorType;
 use crate::clients::traits::{Transaction, RowFetcher};
 use crate::clients::config::Config;
-use crate::dbl::{Migration, ExecutionReport};
+use crate::dbl::{MigrationFile};
 use clickhouse::{Client as ClickHouse};
 use crate::clients::CREATE_CLICKHOUSE_LOCK_TABLE_QUERY;
 use crate::archive::LocalVersionArchive;
 use crate::result::Result;
 use tracing::*;
 use chrono::{DateTime, Local};
-use serde::Deserialize;
 use crate::clients::clickhouse::{MigrationLockRow, DatabaseClient};
 use crate::report::ExecutionReport;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Eq, PartialEq, Debug)]
+#[derive(Clone, Eq, PartialEq, Debug, Deserialize, Serialize)]
 pub enum DriverType {
     ClickHouseDriver
 }
@@ -72,7 +72,7 @@ impl Driver {
         Ok(Some(entry))
     }
 
-    pub async fn migrate(&mut self, migrations: Vec<Migration>, mut archive: LocalVersionArchive) -> Result<ExecutionReport> {
+    pub async fn migrate(&mut self, migrations: Vec<MigrationFile>, mut archive: LocalVersionArchive) -> Result<ExecutionReport> {
         let mut ran_migrations = Vec::new();
 
         self.client.execute_query(CREATE_CLICKHOUSE_LOCK_TABLE_QUERY).await?;

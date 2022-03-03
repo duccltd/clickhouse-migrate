@@ -9,12 +9,15 @@ pub enum ErrorType {
     FailedToReadMigration(std::io::Error, String),
     FailedToWriteMigration(std::io::Error, String),
     FailedToExecuteMigration(std::io::Error),
+    UnableToReadConfig(std::io::Error),
+    UnableToWriteConfig(std::io::Error),
     VersionCacheInvalidType(String),
     NonExistentMigrationVersions(String),
     InvalidMigrationName(String),
     InvalidParameter,
     Clickhouse(Arc<clickhouse::error::Error>),
-    RowNotFound(String)
+    RowNotFound(String),
+    MissingConfigDefinition(String)
 }
 
 impl std::fmt::Display for ErrorType {
@@ -31,6 +34,9 @@ impl std::fmt::Display for ErrorType {
             ErrorType::VersionCacheInvalidType(ref v) => write!(f, "invalid version {}", v),
             ErrorType::InvalidMigrationName(ref n) => write!(f, "invalid name: {}, must be x.sql or v1_x.sql", n),
             ErrorType::RowNotFound(ref e) => write!(f, "could not find row {}", e),
+            ErrorType::UnableToWriteConfig(ref err) => write!(f, "Unable to write configuration: {}", err),
+            ErrorType::UnableToReadConfig(ref err) => write!(f, "Unable to read configuration: {}", err),
+            ErrorType::MissingConfigDefinition(ref e) => write!(f, "Could not find config definition: {:?}", e),
             _ => write!(f, "An unexpected error has occurred"),
         }
     }

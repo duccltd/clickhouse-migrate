@@ -4,11 +4,28 @@ use std::str::FromStr;
 use crate::clients::driver::DriverType;
 use url::{Url};
 use std::borrow::Cow;
+use lazy_static::lazy_static;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, PartialEq, Clone)]
+lazy_static! {
+    pub static ref CONFIGURATION_PATH: String = std::env::var("CONFIGURATION_PATH")
+        .unwrap_or_else(|_| "clickhouse-migrator.toml".to_owned());
+}
+
+const VERSION: &str = "0.1.0";
+
+pub fn load_config() -> Result<Config> {
+    match confy::load::<Config>(&CONFIGURATION_PATH.to_string()) {
+        Ok(res) => Ok(res),
+        Err(e) => Err(ErrorType::UnableToReadConfig(e)),
+    }
+}
+
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Config {
     pub driver: DriverType,
-    uri: Option<String>,
+    pub migrations: Option<String>,
+    pub uri: Option<String>,
     db_host: Option<String>,
     db_user_name: Option<String>,
     db_pass: Option<String>,
@@ -16,21 +33,17 @@ pub struct Config {
     db_database: Option<String>,
 }
 
-impl From<Url> for Config {
-    fn from(url: Url) -> Self {
-        let query = url.query_pairs();
-
-        for (key, value) in query {
-            match key {
-                Cow::from("username") => {
-
-                }
-                _ => {}
-            }
-        }
-
-        Config {
-
+impl std::default::Default for Config {
+    fn default() -> Self {
+        Self {
+            driver: DriverType::ClickHouseDriver,
+            uri: Some("http://localhost:8083".to_string()),
+            migrations: None,
+            db_host: None,
+            db_user_name: None,
+            db_pass: None,
+            db_port: None,
+            db_database: None
         }
     }
 }
@@ -39,9 +52,10 @@ impl Config {
     pub fn new(driver: &str) -> Result<Config> {
         let driver_type = DriverType::from_str(driver)?;
 
-        Ok(Config {
+        Ok(Self {
             driver: driver_type,
             uri: None,
+            migrations: None,
             db_host: None,
             db_user_name: None,
             db_pass: None,
@@ -118,5 +132,9 @@ impl Config {
 
             url
         }
+    }
+
+    pub fn write(&self) -> Result<()> {
+        confy::store(&CONFIGURATION_PATH.to_string(), self).map_err(ErrorType::UnableToWriteConfig)
     }
 }

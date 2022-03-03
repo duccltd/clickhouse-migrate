@@ -3,17 +3,31 @@ use structopt::StructOpt;
 #[derive(Debug, StructOpt)]
 #[structopt(name = "migrator", about = "Migrate your database")]
 pub enum Opts {
-    #[structopt(name = "migrate")]
-    Migrate {
-        #[structopt(short, long, default_value = "clickhouse", help = "Database driver")]
-        driver: String,
+    // Setup the migration tool
+    Setup(Setup),
 
-        #[structopt(short, long, default_value = "http://localhost:8123", help = "Url for database")]
-        url: String,
+    Migrate(Migrate)
+}
 
-        #[structopt(short, long, help = "Path to migrations")]
-        migrations: String,
-    }
+#[derive(Debug, StructOpt)]
+pub enum Migrate {
+    Latest
+}
+
+#[derive(Debug, StructOpt)]
+pub enum Setup {
+    Set(Set),
+
+    View,
+}
+
+#[derive(Debug, StructOpt)]
+pub struct Set {
+    #[structopt(short, long, help = "Url for database")]
+    pub uri: Option<String>,
+
+    #[structopt(short, long, help = "Path to migrations")]
+    pub migrations: Option<String>,
 }
 
 pub fn parse() -> Opts {

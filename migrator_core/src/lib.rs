@@ -10,6 +10,3 @@ pub mod archive;
 pub mod result;
 pub mod executor;
 pub mod report;
-pub mod migration;
-mod table;
-mod examples;

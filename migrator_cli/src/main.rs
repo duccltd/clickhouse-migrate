@@ -8,6 +8,8 @@ use migrator_core::archive::LocalVersionArchive;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    tracing_subscriber::fmt::init();
+
     let mut config = config::load_config().expect("unable to load config");
 
     let opts: cli::Opts = cli::parse();

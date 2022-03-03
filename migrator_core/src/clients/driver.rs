@@ -97,15 +97,17 @@ impl Driver {
     }
 
     pub async fn migrate(&mut self, migrations: Vec<MigrationFile>) -> Result<ExecutionReport> {
-        let mut ran_migrations = Vec::new();
-
+        // Run the prerequisite functions such as creating tables etc.
         self.prerequisite().await?;
+
+        let mut ran_migrations = Vec::new();
 
         let run_migrations = self.run_migrations().await?;
 
         let mut new_migrations: Vec<&MigrationFile> = vec![];
 
-        for migration in &migrations {
+        let runnable_migrations: Vec<&MigrationFile> = migrations.iter().filter(|m| !m.rollback).collect();
+        for migration in &runnable_migrations {
             let old_migration = &run_migrations.iter().find(|m| m.name == migration.name);
 
             // Skip if this has already been run
@@ -132,10 +134,10 @@ impl Driver {
         }
 
         // Check if any migrations are missing
-        if (migrations.len() - new_migrations.len()) != run_migrations.len() {
+        if (runnable_migrations.len() - new_migrations.len()) != run_migrations.len() {
             let missing_migrations: Vec<&String> = run_migrations
                 .iter()
-                .filter(|rm| migrations.iter().find(|om| om.name == rm.name).is_none())
+                .filter(|rm| runnable_migrations.iter().find(|om| om.name == rm.name).is_none())
                 .map(|em| &em.name)
                 .collect();
 

@@ -11,6 +11,7 @@ use tracing::*;
 pub struct MigrationFile {
     pub name: String,
     pub sql: String,
+    pub rollback: bool
 }
 
 impl std::fmt::Display for MigrationFile {
@@ -25,18 +26,17 @@ impl Into<MigrationFile> for PathBuf {
 
         let content = std::fs::read_to_string(self.as_path()).unwrap_or("".to_string());
 
-        MigrationFile::new(&file_name, &content)
+        let rollback = file_name.contains(".down");
+
+        MigrationFile {
+            name: file_name,
+            sql: content,
+            rollback
+        }
     }
 }
 
 impl MigrationFile {
-    pub fn new(name: &str, content: &str) -> MigrationFile {
-        MigrationFile {
-            name: name.to_string(),
-            sql: content.to_string(),
-        }
-    }
-
     pub fn create(directory: String, name: String) -> Result<()> {
         let new_name = name.replace(" ", "-");
         let file_name = format!("{}_{}", Local::now().format("%Y%m%d%H%M%S"), &new_name);

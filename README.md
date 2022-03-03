@@ -2,7 +2,7 @@
 
 ### Note: Still under development
 
-Rust library for running and versioning clickhouse MigrationFiles.
+Rust library for running and versioning clickhouse migration files.
 
 This is currently compatible with the latest version (21.9) of clickhouse.
 

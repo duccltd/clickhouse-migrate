@@ -96,6 +96,17 @@ impl Driver {
         self.client.execute_many(&queries).await
     }
 
+    pub async fn rollback(&mut self, migrations: Vec<MigrationFile>) -> Result<ExecutionReport> {
+        let mut run_migrations = self.run_migrations().await?;
+
+        // Sort by which was run last
+        run_migrations.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+
+        println!("{:?}", run_migrations);
+
+        unimplemented!()
+    }
+
     pub async fn migrate(&mut self, migrations: Vec<MigrationFile>) -> Result<ExecutionReport> {
         // Run the prerequisite functions such as creating tables etc.
         self.prerequisite().await?;

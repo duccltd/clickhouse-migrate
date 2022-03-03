@@ -4,7 +4,6 @@ use crate::clients::config::Config;
 use crate::dbl::{MigrationFile};
 use clickhouse::{Client as ClickHouse};
 use crate::clients::CREATE_CLICKHOUSE_LOCK_TABLE_QUERY;
-use crate::archive::LocalVersionArchive;
 use crate::result::Result;
 use tracing::*;
 use chrono::{DateTime, Local};
@@ -61,39 +60,34 @@ impl Driver {
         }
     }
 
-    pub async fn last_version(&mut self, migration_name: &str) -> Result<Option<MigrationLockRow>> {
-        let entry = self.client.fetch_one(
-            &format!(
-                "SELECT * FROM migration_lock WHERE name = {} LIMIT 1",
-                migration_name
-            )
-        ).await?;
+    pub async fn run_migrations(&mut self) -> Result<Vec<MigrationLockRow>> {
+        let entries = self.client.fetch_many("SELECT * FROM migration_lock").await?;
 
-        Ok(Some(entry))
+        Ok(entries)
     }
 
-    pub async fn migrate(&mut self, migrations: Vec<MigrationFile>, mut archive: LocalVersionArchive) -> Result<ExecutionReport> {
+    pub async fn migrate(&mut self, migrations: Vec<MigrationFile>) -> Result<ExecutionReport> {
         let mut ran_migrations = Vec::new();
 
         self.client.execute_query(CREATE_CLICKHOUSE_LOCK_TABLE_QUERY).await?;
 
+        let run_migrations = self.run_migrations().await?;
+
         for mut migration in migrations {
-            let latest_migration = self.last_version(migration.name()).await?;
+            let existing = &run_migrations.iter().find(|m| m.name == migration.name);
 
-            if let Some(latest_migration) = latest_migration {
-                if migration.checksum() == &latest_migration.checksum {
-                    debug!("{} == {}", migration.checksum(), latest_migration.checksum);
-                    continue;
+            // Skip if this has already been run
+            if let Some(existing) = existing {
+                // Panic if the migration directory is corrupt!
+                if migration.checksum().to_string() != existing.checksum {
+                    panic!("{} != {}. Migration directory is corrupt.", migration.checksum(), existing.checksum);
                 }
-
-                migration.set_version(latest_migration.next_version());
+                continue;
             }
 
             self.client.execute_many(&[migration.sql(), &migration.to_insert_sql()]).await?;
 
             ran_migrations.push(migration.clone());
-
-            archive.add_migration_version(migration.clone());
 
             debug!("Ran migration {}", migration.name())
         }

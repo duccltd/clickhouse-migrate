@@ -1,6 +1,5 @@
 use crate::util;
 use crate::reader;
-use crate::archive::LocalVersionArchive;
 use crate::clients::config::Config;
 use crate::clients::driver::Driver;
 use tracing::*;
@@ -13,12 +12,10 @@ pub async fn run(connection: Box<dyn DatabaseClient>, path: &str) {
         location.clone()
     ).expect("no migrations found");
 
-    let archive = LocalVersionArchive::from(location);
-
     let mut driver = Driver::new(connection);
 
     let report = driver
-        .migrate(migrations, archive)
+        .migrate(migrations)
         .await
         .expect("could not generate report");
 

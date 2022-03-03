@@ -4,7 +4,6 @@ use tracing::*;
 use migrator_core::{util, reader, error::ErrorType, result::Result};
 use migrator_core::clients::config;
 use migrator_core::clients::driver::Driver;
-use migrator_core::archive::LocalVersionArchive;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -34,7 +33,7 @@ async fn main() -> Result<()> {
 
                 if changed {
                     match config.write() {
-                        Ok(()) => info!("config file has been changed"),
+                        Ok(()) => info!("Config file has been changed"),
                         Err(e) => panic!("writing config file: {}", e),
                     }
                 } else {
@@ -57,12 +56,10 @@ async fn main() -> Result<()> {
                 let migrations = reader::find_migration_files(location.clone())
                     .expect("no migrations found");
 
-                let archive = LocalVersionArchive::from(location);
-
                 let mut driver = Driver::from_config(config);
 
                 let report = driver
-                    .migrate(migrations, archive)
+                    .migrate(migrations)
                     .await
                     .expect("could not generate report");
 

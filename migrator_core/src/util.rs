@@ -55,10 +55,8 @@ pub fn create_dir(path: &Path) -> IOResult<()> {
     Ok(())
 }
 
-pub fn checksum(args: &[&str]) -> u64 {
-    let mut hasher = DefaultHasher::new();
-    for arg in args {
-        arg.hash(&mut hasher);
-    }
-    hasher.finish()
+pub fn calculate_hash<T: Hash>(t: &T) -> u64 {
+    let mut s = DefaultHasher::new();
+    t.hash(&mut s);
+    s.finish()
 }

@@ -6,7 +6,6 @@ pub mod error;
 pub mod clients;
 pub mod dbl;
 pub mod reader;
-pub mod archive;
 pub mod result;
 pub mod executor;
 pub mod report;

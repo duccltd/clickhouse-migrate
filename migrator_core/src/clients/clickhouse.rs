@@ -14,14 +14,7 @@ impl <T: Transaction + RowFetcher<MigrationLockRow>> DatabaseClient for T {}
 pub struct MigrationLockRow {
     pub timestamp: u64,
     pub name: String,
-    pub version: u32,
-    pub checksum: u64
-}
-
-impl MigrationLockRow {
-    pub fn next_version(&self) -> u32 {
-        self.version + 1
-    }
+    pub checksum: String
 }
 
 #[async_trait]

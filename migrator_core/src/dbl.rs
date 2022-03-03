@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use crate::util::{write_file, calculate_hash};
 use crate::result::Result;
 use std::hash::{Hash};
+use tracing::*;
 
 #[derive(Debug, Clone, Hash)]
 pub struct MigrationFile {
@@ -49,10 +50,13 @@ impl MigrationFile {
 
     pub fn create(directory: String, name: String) -> Result<()> {
         let new_name = name.replace(" ", "-");
+        let file_name = format!("{}_{}.sql", Local::now().format("%Y%m%d%H%M%S"), &new_name);
 
-        let path = PathBuf::from(format!("{}/{}_{}.sql", &directory, Local::now().format("%Y%m%d%H%M%S"), &new_name));
+        let path = PathBuf::from(format!("{}/{}", &directory, &file_name));
 
         write_file(path, &vec![])?;
+
+        info!("Created new migration: {}", file_name);
 
         Ok(())
     }

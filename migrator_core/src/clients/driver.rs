@@ -71,15 +71,18 @@ impl Driver {
 
         let run_migrations = self.run_migrations().await?;
 
+        let mut new_migrations: Vec<&MigrationFile> = vec![];
+
         for migration in &migrations {
-            let existing = &run_migrations.iter().find(|m| m.name == migration.name);
+            let old_migration = &run_migrations.iter().find(|m| m.name == migration.name);
 
             // Skip if this has already been run
-            if let Some(existing) = existing {
+            if let Some(old_migration) = old_migration {
                 // Panic if the migration directory is corrupt!
-                if migration.checksum().to_string() != existing.checksum {
-                    panic!("{} != {}. Migration directory is corrupt.", migration.checksum(), existing.checksum);
+                if migration.checksum().to_string() != old_migration.checksum {
+                    panic!("Checksum {} != {}. Migration directory is corrupt. {:?}", migration.checksum(), old_migration.checksum, vec![&migration.name, &old_migration.name]);
                 }
+
                 continue;
             }
 
@@ -87,9 +90,17 @@ impl Driver {
             if migration.sql() == "" {
                 panic!("{}. Empty migration file.", migration.name());
             }
+
+            new_migrations.push(migration);
         }
 
-        for migration in &migrations {
+        if (migrations.len() - new_migrations.len()) != run_migrations.len() {
+            let missing_migrations: Vec<&String> = run_migrations.iter().filter(|rm| migrations.iter().find(|om| om.name == rm.name).is_none()).map(|em| &em.name).collect();
+
+            panic!("Migration directory is corrupt. Missing following files: {:?}", missing_migrations);
+        }
+
+        for migration in new_migrations {
             self.client.execute_many(&[migration.sql(), &migration.to_insert_sql()]).await?;
 
             ran_migrations.push(migration.clone());

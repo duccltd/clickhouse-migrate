@@ -18,7 +18,7 @@ pub enum Migrate {
     Latest,
 
     // Rollback latest migration
-    Rollback
+    Rollback,
 }
 
 #[derive(Debug, StructOpt)]

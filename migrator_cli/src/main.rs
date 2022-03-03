@@ -101,7 +101,7 @@ async fn main() -> Result<()> {
 
                 let mut driver = Driver::from_config(config);
 
-                 let report = driver
+                let report = driver
                     .rollback(migrations)
                     .await
                     .expect("could not generate report");

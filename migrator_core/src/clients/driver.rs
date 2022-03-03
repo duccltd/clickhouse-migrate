@@ -117,7 +117,8 @@ impl Driver {
 
         let mut new_migrations: Vec<&MigrationFile> = vec![];
 
-        let runnable_migrations: Vec<&MigrationFile> = migrations.iter().filter(|m| !m.rollback).collect();
+        let runnable_migrations: Vec<&MigrationFile> =
+            migrations.iter().filter(|m| !m.rollback).collect();
         for migration in &runnable_migrations {
             let old_migration = &run_migrations.iter().find(|m| m.name == migration.name);
 
@@ -148,7 +149,12 @@ impl Driver {
         if (runnable_migrations.len() - new_migrations.len()) != run_migrations.len() {
             let missing_migrations: Vec<&String> = run_migrations
                 .iter()
-                .filter(|rm| runnable_migrations.iter().find(|om| om.name == rm.name).is_none())
+                .filter(|rm| {
+                    runnable_migrations
+                        .iter()
+                        .find(|om| om.name == rm.name)
+                        .is_none()
+                })
                 .map(|em| &em.name)
                 .collect();
 

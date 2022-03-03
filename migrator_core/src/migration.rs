@@ -11,7 +11,7 @@ use tracing::*;
 pub struct MigrationFile {
     pub name: String,
     pub sql: String,
-    pub rollback: bool
+    pub rollback: bool,
 }
 
 impl std::fmt::Display for MigrationFile {
@@ -31,7 +31,7 @@ impl Into<MigrationFile> for PathBuf {
         MigrationFile {
             name: file_name,
             sql: content,
-            rollback
+            rollback,
         }
     }
 }
